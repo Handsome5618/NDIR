@@ -19,9 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
-#include "dma.h"
 #include "i2c.h"
-#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -67,7 +65,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t apple = 0x0000;
+float ADC_Data = 0;
+float Apple    = 3.154;
 /* USER CODE END 0 */
 
 /**
@@ -98,14 +97,13 @@ int main(void)
 
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
-    MX_DMA_Init();
     MX_ADC1_Init();
     MX_I2C1_Init();
-    MX_SPI1_Init();
     MX_TIM3_Init();
     MX_USART1_UART_Init();
     /* USER CODE BEGIN 2 */
     HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+    ADS1118_Init();
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -114,13 +112,13 @@ int main(void)
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
+        ADS1118_Get_CH0(&ADC_Data);
         HAL_Delay(500);
-        apple++;
-        printf("%d\r\n", apple);
         Led_LedRunTask();
-        HAL_Delay(500);
-        apple--;
-        printf("%d\r\n", apple);
+
+        printf("Apple:%f\n", Apple);
+
+        HAL_Delay(1);
     }
     /* USER CODE END 3 */
 }

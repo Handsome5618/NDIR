@@ -5,10 +5,10 @@
     "global": {
         "$float-abi-type": "softfp",
         "output-debug-info": "enable",
-        "misc-control": "--specs=nosys.specs --specs=nano.specs"
+        "misc-control": "--specs=nosys.specs --specs=nano.specs -u_printf_float"
     },
     "c/cpp-compiler": {
-        "language-c": "c11",
+        "language-c": "gnu99",
         "language-cpp": "c++11",
         "optimization": "level-0",
         "warnings": "all-warnings",
@@ -19,6 +19,7 @@
     "linker": {
         "output-format": "elf",
         "remove-unused-input-sections": true,
-        "LIB_FLAGS": "-lm"
+        "LIB_FLAGS": "-lm",
+        "LD_FLAGS": "-Wl,-u_printf_float"
     }
 }
