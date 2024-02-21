@@ -57,18 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define DS18B20_Pin GPIO_PIN_3
-#define DS18B20_GPIO_Port GPIOA
-#define SPI_CSK_Pin GPIO_PIN_4
-#define SPI_CSK_GPIO_Port GPIOA
-#define SPI_SCK_Pin GPIO_PIN_5
-#define SPI_SCK_GPIO_Port GPIOA
-#define SPI_MISO_Pin GPIO_PIN_6
-#define SPI_MISO_GPIO_Port GPIOA
-#define SPI_MOSI_Pin GPIO_PIN_7
-#define SPI_MOSI_GPIO_Port GPIOA
-#define LED_Pin GPIO_PIN_12
-#define LED_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

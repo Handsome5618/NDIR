@@ -8,7 +8,7 @@
         "misc-control": "--specs=nosys.specs --specs=nano.specs -u_printf_float"
     },
     "c/cpp-compiler": {
-        "language-c": "gnu99",
+        "language-c": "c11",
         "language-cpp": "c++11",
         "optimization": "level-0",
         "warnings": "all-warnings",
@@ -19,7 +19,6 @@
     "linker": {
         "output-format": "elf",
         "remove-unused-input-sections": true,
-        "LIB_FLAGS": "-lm",
-        "LD_FLAGS": "-Wl,-u_printf_float"
+        "LIB_FLAGS": "-lm"
     }
 }

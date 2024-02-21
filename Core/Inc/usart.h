@@ -29,14 +29,14 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-#define USART_REC_LEN 1000				/*串口数组存放最大长度*/
-#define RXBUFFERSIZE 1					/*缓存区最大长度*/
+
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
-
+#define USART_REC_LEN 1000				/*串口数组存放最大长度*/
+#define RXBUFFERSIZE 1					/*缓存区最大长度*/
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);

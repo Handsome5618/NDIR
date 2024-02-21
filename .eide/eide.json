@@ -17,7 +17,7 @@
   "deviceName": null,
   "packDir": null,
   "miscInfo": {
-    "uid": "88e8cdd27857c988a619a2cf29d940af"
+    "uid": "bbd5bdcd47ff9ac89f346e1815681c59"
   },
   "targets": {
     "Debug": {
@@ -26,7 +26,7 @@
       "compileConfig": {
         "cpuType": "Cortex-M3",
         "floatingPointHardware": "none",
-        "scatterFilePath": "STM32F103C8Tx_FLASH.ld",
+        "scatterFilePath": "STM32F103RCTx_FLASH.ld",
         "useCustomScatterFile": true,
         "storageLayout": {
           "RAM": [],
@@ -40,7 +40,7 @@
         "baseAddr": "",
         "cpuInfo": {
           "vendor": "ST",
-          "cpuName": "STM32F103C8"
+          "cpuName": "STM32F103RC"
         },
         "proType": 1,
         "speed": 8000,
@@ -62,7 +62,7 @@
         "sourceDirList": [],
         "defineList": [
           "USE_HAL_DRIVER",
-          "STM32F103xB"
+          "STM32F103xE"
         ]
       }
     }
