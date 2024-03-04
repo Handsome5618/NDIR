@@ -164,7 +164,7 @@ static uint8_t DS18B20_ReadBit(void)
     DS18B20_Mode_IPU();
     // Delay_us(2);
 
-    if (DS18B20_Data_IN() == SET)
+    if (DS18B20_Data_IN() == GPIO_PIN_SET)
         dat = 1;
     else
         dat = 0;

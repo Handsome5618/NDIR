@@ -1,73 +1,73 @@
 #include "ads1118.h"
 
-void MySPI_W_SS(uint8_t BitValue)
-{
-    HAL_GPIO_WritePin(ADC_CS_GPIO_PORT, ADC_CS_PIN, BitValue);
-}
+// void MySPI_W_SS(uint8_t BitValue)
+// {
+//     HAL_GPIO_WritePin(ADC_CS_GPIO_PORT, ADC_CS_PIN, BitValue);
+// }
 
-void MySPI_W_MOSI(uint8_t BitValue)
-{
-    HAL_GPIO_WritePin(ADC_MOSI_GPIO_Port, ADC_CLK_Pin, BitValue);
-}
+// void MySPI_W_MOSI(uint8_t BitValue)
+// {
+//     HAL_GPIO_WritePin(ADC_MOSI_GPIO_Port, ADC_CLK_Pin, BitValue);
+// }
 
-void MySPI_W_SCK(uint8_t BitValue)
-{
-    HAL_GPIO_WritePin(ADC_CLK_GPIO_Port, ADC_CLK_Pin, BitValue);
-}
+// void MySPI_W_SCK(uint8_t BitValue)
+// {
+//     HAL_GPIO_WritePin(ADC_CLK_GPIO_Port, ADC_CLK_Pin, BitValue);
+// }
 
-uint8_t MySPI_R_MISO(void)
-{
-    return HAL_GPIO_ReadPin(ADC_MISO_GPIO_Port, ADC_MISO_Pin);
-}
+// uint8_t MySPI_R_MISO(void)
+// {
+//     return HAL_GPIO_ReadPin(ADC_MISO_GPIO_Port, ADC_MISO_Pin);
+// }
 
-void MySPI_Start(void)
-{
-    MySPI_W_SS(0);
-}
+// void MySPI_Start(void)
+// {
+//     MySPI_W_SS(0);
+// }
 
-void MySPI_Stop(void)
-{
-    MySPI_W_SS(1);
-}
+// void MySPI_Stop(void)
+// {
+//     MySPI_W_SS(1);
+// }
 
-uint8_t MySPI_SwapByte(uint8_t ByteSend)
-{
-    uint8_t i, ByteReceive = 0x00;
+// uint8_t MySPI_SwapByte(uint8_t ByteSend)
+// {
+//     uint8_t i, ByteReceive = 0x00;
 
-    for (i = 0; i < 8; i++) {
-        MySPI_W_MOSI(ByteSend & (0x80 >> i));
-        MySPI_W_SCK(1);
-        if (MySPI_R_MISO() == 1) { ByteReceive |= (0x80 >> i); }
-        MySPI_W_SCK(0);
-    }
-    return ByteReceive;
-}
+//     for (i = 0; i < 8; i++) {
+//         MySPI_W_MOSI(ByteSend & (0x80 >> i));
+//         MySPI_W_SCK(1);
+//         if (MySPI_R_MISO() == 1) { ByteReceive |= (0x80 >> i); }
+//         MySPI_W_SCK(0);
+//     }
+//     return ByteReceive;
+// }
 
-/**
- * @brief    ADS1118初始化
- * @param  	 无
- * @retval   无
- */
-void ADS1118_Init(void)
-{
-    uint16_t REG_Init = CH0 | V6_144 | MODE_SINGLE | RATE_860SPS | GET_ADC | PULL_UP_EN | VALID_SET;
-    uint8_t pTxData[4];
-    uint8_t pRxData[4];
-    pTxData[0] = (uint8_t)(REG_Init >> 8);
-    pTxData[1] = (uint8_t)REG_Init;
-    pTxData[2] = (uint8_t)(REG_Init >> 8);
-    pTxData[3] = (uint8_t)REG_Init;
+// /**
+//  * @brief    ADS1118初始化
+//  * @param  	 无
+//  * @retval   无
+//  */
+// void ADS1118_Init(void)
+// {
+//     uint16_t REG_Init = CH0 | V6_144 | MODE_SINGLE | RATE_860SPS | GET_ADC | PULL_UP_EN | VALID_SET;
+//     uint8_t pTxData[4];
+//     uint8_t pRxData[4];
+//     pTxData[0] = (uint8_t)(REG_Init >> 8);
+//     pTxData[1] = (uint8_t)REG_Init;
+//     pTxData[2] = (uint8_t)(REG_Init >> 8);
+//     pTxData[3] = (uint8_t)REG_Init;
 
-    MySPI_W_SS(0);
-    while (HAL_GPIO_ReadPin(ADC_MISO_GPIO_Port, ADC_MISO_Pin) != GPIO_PIN_RESET) {
-        printf("Error\r\n");
-    }
+//     MySPI_W_SS(0);
+//     while (HAL_GPIO_ReadPin(ADC_MISO_GPIO_Port, ADC_MISO_Pin) != GPIO_PIN_RESET) {
+//         printf("Error\r\n");
+//     }
 
-    for (uint8_t i = 0; i < 4; i++) {
-        pRxData[i] = MySPI_SwapByte(pTxData[i]);
-    }
-    MySPI_W_SS(1);
-}
+//     for (uint8_t i = 0; i < 4; i++) {
+//         pRxData[i] = MySPI_SwapByte(pTxData[i]);
+//     }
+//     MySPI_W_SS(1);
+// }
 
 // /**
 //  * @brief    ADS1118初始化

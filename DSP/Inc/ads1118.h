@@ -54,13 +54,13 @@ typedef enum {
     CHANNEL_IN4 = 0x7000
 } ADS1118_CHANNEL;
 
-void ADS1118_Init(void);
-void ADS1118_Read_ADC(uint16_t Channel, float *pData, uint16_t Size);
+// void ADS1118_Init(void);
+// void ADS1118_Read_ADC(uint16_t Channel, float *pData, uint16_t Size);
 
-void MySPI_Init(void);
-void MySPI_Start(void);
-void MySPI_Stop(void);
-uint8_t MySPI_SwapByte(uint8_t ByteSend);
+// void MySPI_Init(void);
+// void MySPI_Start(void);
+// void MySPI_Stop(void);
+// uint8_t MySPI_SwapByte(uint8_t ByteSend);
 
 #define ADC_CS_PIN         GPIO_PIN_4
 #define ADC_CS_GPIO_PORT   GPIOA
