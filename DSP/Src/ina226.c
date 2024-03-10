@@ -11,12 +11,13 @@ void INA226_Init(void)
     tData[0] = Configuration_Register;
     tData[1] = Configuration_Register_Init >> 8;
     tData[2] = (uint8_t)Configuration_Register_Init;
-    HAL_I2C_Master_Transmit(&hi2c1, INA226_ADDR, tData, 3, 0xff);
+    tData[2] = HAL_I2C_Master_Transmit(&hi2c1, INA226_ADDR, tData, 3, 0xff);
     HAL_Delay(5);
     tData[0] = Calibration_Register;
     tData[1] = Calibration_Register_Init >> 8;
     tData[2] = (uint8_t)Calibration_Register_Init;
-    HAL_I2C_Master_Transmit(&hi2c1, INA226_ADDR, tData, 3, 0xff);
+    tData[2] = HAL_I2C_Master_Transmit(&hi2c1, INA226_ADDR, tData, 3, 0xff);
+    HAL_Delay(5);
 }
 
 /**
