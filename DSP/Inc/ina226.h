@@ -5,8 +5,8 @@
 #include "i2c.h"
 
 #define INA226_ADDR                 0x80   // 地址
-#define Configuration_Register_Init 0x41ff // 1次平均 8.244ms 连续监测
-#define Calibration_Register_Init   0x0824 // 0.5Ω 0.005mA
+#define Configuration_Register_Init 0x4127 // 1次平均 1.1ms 连续监测
+#define Calibration_Register_Init   0x0800 // 0.5Ω 0.005mA
 
 #define Configuration_Register      0x00 // 配置寄存器
 #define Shunt_Voltage_Register      0x01 // 电压降寄存器

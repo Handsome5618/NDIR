@@ -19,6 +19,7 @@
     "linker": {
         "output-format": "elf",
         "remove-unused-input-sections": true,
-        "LIB_FLAGS": "-lm"
+        "LIB_FLAGS": "-lm",
+        "$toolName": "auto"
     }
 }

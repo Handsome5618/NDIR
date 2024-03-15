@@ -1,32 +1,31 @@
 
-GraphedExpression="Pow", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#a00909
-GraphedExpression="460", Color=#09a01b
-OpenDocument="main.c", FilePath="c:/Users/Administrator/Desktop/NDIR/Core/Src/main.c", Line=105
-OpenDocument="stm32f1xx_hal_i2c.c", FilePath="c:/Users/Administrator/Desktop/NDIR/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c", Line=7432
-OpenDocument="stm32f1xx_hal.c", FilePath="c:/Users/Administrator/Desktop/NDIR/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c", Line=325
+GraphedExpression="460", DisplayFormat=DISPLAY_FORMAT_DEC, Color=#a00909
+GraphedExpression="Pow", Color=#09a01b
+GraphedExpression="ADC_IN1_Subtract", Color=#09a087
+GraphedExpression="ADC_IN2_Subtract", Color=#0984a0
+GraphedExpression="ADC_IN1_IN2_Subtract", Color=#0964a0
+OpenDocument="main.c", FilePath="c:/Users/Administrator/Desktop/NDIR/Core/Src/main.c", Line=118
 OpenDocument="startup_stm32f103xe.s", FilePath="c:/Users/Administrator/Desktop/NDIR/Core/startup_stm32f103xe.s", Line=55
-OpenDocument="stm32f1xx_it.c", FilePath="c:/Users/Administrator/Desktop/NDIR/Core/Src/stm32f1xx_it.c", Line=157
+OpenDocument="adc.c", FilePath="c:/Users/Administrator/Desktop/NDIR/Core/Src/adc.c", Line=108
 OpenToolbar="Debug", Floating=0, x=0, y=0
 OpenWindow="Source Files", DockArea=BOTTOM, x=1, y=0, w=979, h=319, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Break & Tracepoints", DockArea=LEFT, x=0, y=1, w=447, h=173, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VectorCatchIndexMask=254
+OpenWindow="Break & Tracepoints", DockArea=LEFT, x=0, y=1, w=447, h=187, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VectorCatchIndexMask=0
 OpenWindow="Memory 1", DockArea=BOTTOM, x=2, y=0, w=496, h=319, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x200002AC
-OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=2, w=447, h=230, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Call Graph", DockArea=LEFT, x=0, y=0, w=447, h=230, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Data Sampling", DockArea=RIGHT, x=0, y=1, w=590, h=338, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
-OpenWindow="Timeline", DockArea=RIGHT, x=0, y=0, w=590, h=296, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=0, CodePaneShown=0, PinCursor="Cursor Movable", TimePerDiv="500 ms / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=1, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="398;0", PowerGraphDrawAsPoints=0, PowerGraphLegendShown=0, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="273;0", CodeGraphLegendShown=0, CodeGraphLegendPosition="279;0"
+OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=2, w=447, h=223, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Call Graph", DockArea=LEFT, x=0, y=0, w=447, h=223, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Data Sampling", DockArea=RIGHT, x=0, y=1, w=496, h=254, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
+OpenWindow="Timeline", DockArea=RIGHT, x=0, y=0, w=496, h=380, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=0, CodePaneShown=0, PinCursor="Cursor Movable", TimePerDiv="5 s / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=1, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="0;0", PowerGraphDrawAsPoints=0, PowerGraphLegendShown=0, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="694;0", CodeGraphLegendShown=0, CodeGraphLegendPosition="700;0"
 OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=443, h=319, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 TableHeader="Vector Catches", SortCol="None", SortOrder="ASCENDING", VisibleCols=["";"Vector Catch";"Description"], ColWidths=[50;300;500]
 TableHeader="Break & Tracepoints", SortCol="Type", SortOrder="DESCENDING", VisibleCols=["";"Type";"Location";"Extras"], ColWidths=[100;100;100;147]
 TableHeader="Source Files", SortCol="Status", SortOrder="DESCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[168;100;100;100;590]
 TableHeader="Call Graph", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Stack Total";"Stack Local";"Code Total";"Code Local";"Depth";"Called From"], ColWidths=[336;100;100;100;100;100;100]
-TableHeader="Data Sampling Table", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";" Pow";" 460"], ColWidths=[100;100;100;100]
-TableHeader="Data Sampling Setup", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[100;140;100;100;100;100;100;100;100]
+TableHeader="Data Sampling Table", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";" 460";" Pow";" ADC_IN1_Subtract";" ADC_IN2_Subtract";" ADC_IN1_IN2_Subtract"], ColWidths=[100;100;100;100;100;100;100]
+TableHeader="Data Sampling Setup", SortCol="Average", SortOrder="DESCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[143;140;100;100;100;100;100;100;100]
 TableHeader="Power Sampling", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
-TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[126;115;100;100]
+TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[126;115;100;106]
 TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
 TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[200;100;100;359]
-WatchedExpression="Pow", Window=Watched Data 1
 WatchedExpression="IR_PID", Window=Watched Data 1
-WatchedExpression="Current", Window=Watched Data 1
-WatchedExpression="Voltage", Window=Watched Data 1
-WatchedExpression="Pow", Window=Watched Data 1
+WatchedExpression="0", Window=Watched Data 1
+WatchedExpression="0", Window=Watched Data 1

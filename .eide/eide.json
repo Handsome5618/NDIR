@@ -5,8 +5,8 @@
   "srcDirs": [
     ".eide/deps",
     "Core",
-    "Drivers",
-    "DSP"
+    "DSP",
+    "Drivers"
   ],
   "virtualFolder": {
     "name": "<virtual_root>",
@@ -15,7 +15,7 @@
   },
   "outDir": "build",
   "deviceName": null,
-  "packDir": null,
+  "packDir": ".pack/Keil/STM32F1xx_DFP.2.3.0",
   "miscInfo": {
     "uid": "bbd5bdcd47ff9ac89f346e1815681c59"
   },
@@ -50,19 +50,20 @@
       "custom_dep": {
         "name": "default",
         "incList": [
-          ".eide/deps",
           "Core/Inc",
-          "Drivers/STM32F1xx_HAL_Driver/Inc",
+          "DSP/Inc",
+          "Drivers/CMSIS/Include",
           "Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
           "Drivers/CMSIS/Device/ST/STM32F1xx/Include",
-          "Drivers/CMSIS/Include",
-          "DSP/Inc"
+          "Drivers/STM32F1xx_HAL_Driver/Inc",
+          "Middlewares/ST/ARM/DSP/Inc"
         ],
         "libList": [],
         "sourceDirList": [],
         "defineList": [
           "USE_HAL_DRIVER",
-          "STM32F103xE"
+          "STM32F103xE",
+          "ARM_MATH_CM3"
         ]
       }
     }
