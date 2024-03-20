@@ -193,7 +193,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
         __HAL_RCC_TIM2_CLK_ENABLE();
 
         /* TIM2 interrupt Init */
-        HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+        HAL_NVIC_SetPriority(TIM2_IRQn, 2, 0);
         HAL_NVIC_EnableIRQ(TIM2_IRQn);
         /* USER CODE BEGIN TIM2_MspInit 1 */
 
@@ -206,7 +206,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
         __HAL_RCC_TIM4_CLK_ENABLE();
 
         /* TIM4 interrupt Init */
-        HAL_NVIC_SetPriority(TIM4_IRQn, 3, 0);
+        HAL_NVIC_SetPriority(TIM4_IRQn, 1, 0);
         HAL_NVIC_EnableIRQ(TIM4_IRQn);
         /* USER CODE BEGIN TIM4_MspInit 1 */
 
@@ -238,7 +238,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *tim_pwmHandle)
         __HAL_RCC_TIM3_CLK_ENABLE();
 
         /* TIM3 interrupt Init */
-        HAL_NVIC_SetPriority(TIM3_IRQn, 2, 0);
+        HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
         HAL_NVIC_EnableIRQ(TIM3_IRQn);
         /* USER CODE BEGIN TIM3_MspInit 1 */
 
@@ -339,14 +339,15 @@ void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef *tim_pwmHandle)
  */
 uint16_t Pow_Original = 0;
 float Pow;
+float Temperature;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    if (htim->Instance == TIM4) { // 1Hz频率驱动光源
-        // Led_LedRunTask();
+    // 1Hz频率驱动光源
+    if (htim->Instance == TIM4) {
         RI_Status = ~RI_Status;
     }
-
-    if (htim->Instance == TIM5) { // 定时计算PID输出 频率1000HZ
+    // 定时计算PID输出 频率1000HZ
+    if (htim->Instance == TIM5) {
         Pow_Original = INA226_Read_Pow();
         Pow          = Power_Register_LSB * Pow_Original;
         if (RI_Status) {
@@ -357,8 +358,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, IR_PID.output);
         }
     }
-
-    if (htim->Instance == TIM2) { // 2000Hz采集ADC信号
+    // 2000Hz采集ADC信号
+    if (htim->Instance == TIM2) {
         ADC_Status = 1;
     }
 }

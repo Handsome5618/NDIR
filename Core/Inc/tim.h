@@ -32,6 +32,7 @@ extern "C" {
 #include "led.h"
 #include "ina226.h"
 #include "pid.h"
+#include "ds18b20.h"
 /* USER CODE END Includes */
 
 extern TIM_HandleTypeDef htim2;

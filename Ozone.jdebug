@@ -33,7 +33,6 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  Edit.SysVar (VAR_HSS_SPEED, FREQ_2_KHZ);
   File.Open ("$(ProjectDir)/build/Debug/NDIR.elf");
 }
 

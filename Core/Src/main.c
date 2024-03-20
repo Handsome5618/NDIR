@@ -48,15 +48,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "pid.h"
-#include "ds18b20.h"
 #include "led.h"
 #include "flash.h"
+#include "ds18b20.h"
 #include "stdio.h"
 #include <inttypes.h>
 #include <string.h>
 #include "ina226.h"
 #include "filter.h"
-// #include "arm_math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -102,6 +101,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+extern float Temperature;
+float SF6_PPM;
 
 Mypid_t IR_PID;
 uint8_t ADC_Start = 0;
@@ -160,12 +161,14 @@ int main(void)
     MX_TIM2_Init();
     /* USER CODE BEGIN 2 */
     INA226_Init();
+    DS18B20_Init();
 
     HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1); // 开启PWM通道1
     PID_Init(&IR_PID, IR_PID_P, IR_PID_I, IR_PID_D, IR_PID_MAXOUTPUT, IR_PID_MAXINTEGRAL);
 
     HAL_ADCEx_Calibration_Start(&hadc1); // 初始校准
-                                         /* USER CODE END 2 */
+
+    /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
@@ -199,10 +202,10 @@ int main(void)
 
                 NDIR_Data_Processor(ADC_IN1_FirData, PeaktoPeak1, MinitoMini1);
                 NDIR_Data_Processor(ADC_IN2_FirData, PeaktoPeak2, MinitoMini2);
-                // for (uint8_t i = 0; i < 3; i++) {
-                //     printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", PeaktoPeak1[i], MinitoMini1[i], PeaktoPeak2[i], MinitoMini2[i], PeaktoPeak2[i] - PeaktoPeak1[i], MinitoMini1[i] - MinitoMini2[i], (PeaktoPeak2[i] - PeaktoPeak1[i]) + (MinitoMini1[i] - MinitoMini2[i]));
-                // }
-                printf("%.2f\r\n", ((PeaktoPeak2[0] - PeaktoPeak1[0]) + (MinitoMini1[0] - MinitoMini2[0]) + (PeaktoPeak2[1] - PeaktoPeak1[1]) + (MinitoMini1[1] - MinitoMini2[1]) + (PeaktoPeak2[2] - PeaktoPeak1[2]) + (MinitoMini1[2] - MinitoMini2[2]) + (PeaktoPeak2[3] - PeaktoPeak1[3]) + (MinitoMini1[3] - MinitoMini2[3])) / 4);
+
+                SF6_PPM = ((PeaktoPeak2[0] - PeaktoPeak1[0]) + (MinitoMini1[0] - MinitoMini2[0]) + (PeaktoPeak2[1] - PeaktoPeak1[1]) + (MinitoMini1[1] - MinitoMini2[1]) + (PeaktoPeak2[2] - PeaktoPeak1[2]) + (MinitoMini1[2] - MinitoMini2[2]) + (PeaktoPeak2[3] - PeaktoPeak1[3]) + (MinitoMini1[3] - MinitoMini2[3])) / 4;
+
+                printf("%.2f,%.2f\r\n", SF6_PPM, 0.93458 * SF6_PPM - 826.1682);
                 // for (uint16_t i = 0; i < DATA_SIZE; i++) {
                 //     printf("%.2f,%.2f,%.2f,%.2f,%d\r\n", ADC_IN1_Data[i], ADC_IN2_Data[i], ADC_IN1_FirData[i], ADC_IN2_FirData[i], i);
                 // }

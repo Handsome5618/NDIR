@@ -1,17 +1,6 @@
 #include "ds18b20.h"
 
 #define Delay_ms(x) HAL_Delay(x)
-/* 私有变量 ------------------------------------------------------------------*/
-/* 扩展变量 ------------------------------------------------------------------*/
-/* 私有函数原形 --------------------------------------------------------------*/
-static void DS18B20_Mode_IPU(void);
-static void DS18B20_Mode_Out_PP(void);
-static void DS18B20_Rst(void);
-static uint8_t DS18B20_Presence(void);
-static uint8_t DS18B20_ReadBit(void);
-static uint8_t DS18B20_ReadByte(void);
-static void DS18B20_WriteByte(uint8_t dat);
-static void DS18B20_SkipRom(void);
 
 /* 函数体 --------------------------------------------------------------------*/
 /**
@@ -20,7 +9,7 @@ static void DS18B20_SkipRom(void);
  * 返 回 值: 无
  * 说    明：无
  */
-static void DS18B20_Delay(uint16_t time)
+void DS18B20_Delay(uint16_t time)
 {
     uint8_t i;
 
@@ -56,7 +45,7 @@ uint8_t DS18B20_Init(void)
  * 返 回 值: 无
  * 说    明：无
  */
-static void DS18B20_Mode_IPU(void)
+void DS18B20_Mode_IPU(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -73,7 +62,7 @@ static void DS18B20_Mode_IPU(void)
  * 返 回 值: 无
  * 说    明：无
  */
-static void DS18B20_Mode_Out_PP(void)
+void DS18B20_Mode_Out_PP(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -90,7 +79,7 @@ static void DS18B20_Mode_Out_PP(void)
  * 返 回 值: 无
  * 说    明：无
  */
-static void DS18B20_Rst(void)
+void DS18B20_Rst(void)
 {
     /* 主机设置为推挽输出 */
     DS18B20_Mode_Out_PP();
@@ -113,7 +102,7 @@ static void DS18B20_Rst(void)
  * 返 回 值: 0：成功，1：失败
  * 说    明：无
  */
-static uint8_t DS18B20_Presence(void)
+uint8_t DS18B20_Presence(void)
 {
     uint8_t pulse_time = 0;
 
@@ -150,7 +139,7 @@ static uint8_t DS18B20_Presence(void)
  * 返 回 值: 读取到的数据
  * 说    明：无
  */
-static uint8_t DS18B20_ReadBit(void)
+uint8_t DS18B20_ReadBit(void)
 {
     uint8_t dat;
 
@@ -181,7 +170,7 @@ static uint8_t DS18B20_ReadBit(void)
  * 返 回 值: 读到的数据
  * 说    明：无
  */
-static uint8_t DS18B20_ReadByte(void)
+uint8_t DS18B20_ReadByte(void)
 {
     uint8_t i, j, dat = 0;
 
@@ -199,7 +188,7 @@ static uint8_t DS18B20_ReadByte(void)
  * 返 回 值: 无
  * 说    明：无
  */
-static void DS18B20_WriteByte(uint8_t dat)
+void DS18B20_WriteByte(uint8_t dat)
 {
     uint8_t i, testb;
     DS18B20_Mode_Out_PP();
@@ -233,7 +222,7 @@ static void DS18B20_WriteByte(uint8_t dat)
  * 返 回 值: 无
  * 说    明：无
  */
-static void DS18B20_SkipRom(void)
+void DS18B20_SkipRom(void)
 {
     DS18B20_Rst();
     DS18B20_Presence();
