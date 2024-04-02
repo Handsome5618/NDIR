@@ -4,8 +4,8 @@
   "dependenceList": [],
   "srcDirs": [
     ".eide/deps",
+    "BSP",
     "Core",
-    "DSP",
     "Drivers"
   ],
   "virtualFolder": {
@@ -15,18 +15,18 @@
   },
   "outDir": "build",
   "deviceName": null,
-  "packDir": ".pack/Keil/STM32F1xx_DFP.2.3.0",
+  "packDir": null,
   "miscInfo": {
-    "uid": "bbd5bdcd47ff9ac89f346e1815681c59"
+    "uid": "8e1ede05df6568b7c478c6f0b65e6e7e"
   },
   "targets": {
     "Debug": {
       "excludeList": [],
       "toolchain": "GCC",
       "compileConfig": {
-        "cpuType": "Cortex-M3",
-        "floatingPointHardware": "none",
-        "scatterFilePath": "STM32F103RCTx_FLASH.ld",
+        "cpuType": "Cortex-M4",
+        "floatingPointHardware": "single",
+        "scatterFilePath": "STM32G473CBTx_FLASH.ld",
         "useCustomScatterFile": true,
         "storageLayout": {
           "RAM": [],
@@ -40,7 +40,7 @@
         "baseAddr": "",
         "cpuInfo": {
           "vendor": "ST",
-          "cpuName": "STM32F103RC"
+          "cpuName": "STM32G473CB"
         },
         "proType": 1,
         "speed": 8000,
@@ -50,20 +50,19 @@
       "custom_dep": {
         "name": "default",
         "incList": [
+          ".eide/deps",
           "Core/Inc",
-          "DSP/Inc",
+          "Drivers/STM32G4xx_HAL_Driver/Inc",
+          "Drivers/STM32G4xx_HAL_Driver/Inc/Legacy",
+          "Drivers/CMSIS/Device/ST/STM32G4xx/Include",
           "Drivers/CMSIS/Include",
-          "Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
-          "Drivers/CMSIS/Device/ST/STM32F1xx/Include",
-          "Drivers/STM32F1xx_HAL_Driver/Inc",
-          "Middlewares/ST/ARM/DSP/Inc"
+          "BSP/Inc"
         ],
         "libList": [],
         "sourceDirList": [],
         "defineList": [
-          "USE_HAL_DRIVER",
-          "STM32F103xE",
-          "ARM_MATH_CM3"
+          "USE_HAL_DRIVE",
+          "STM32G473xx"
         ]
       }
     }

@@ -5,7 +5,7 @@
 **********************************************************************
 
 File          : C:/Users/Administrator/Desktop/NDIR/Ozone.jdebug
-Created       : 5 Mar 2024 14:10
+Created       : 25 Mar 2024 14:30
 Ozone Version : V3.24
 */
 
@@ -24,12 +24,12 @@ void OnProjectLoad (void) {
   //
   Project.AddPathSubstitute ("C:/Users/Administrator/Desktop/NDIR", "$(ProjectDir)");
   Project.AddPathSubstitute ("c:/users/administrator/desktop/ndir", "$(ProjectDir)");
-  Project.SetDevice ("Cortex-M3");
+  Project.SetDevice ("Cortex-M4");
   Project.SetHostIF ("USB", "69664016");
   Project.SetTargetIF ("SWD");
   Project.SetTIFSpeed ("4 MHz");
-  Project.AddSvdFile ("$(InstallDir)/Config/CPU/Cortex-M3.svd");
-  Project.AddSvdFile ("$(InstallDir)/Config/Peripherals/STM32F103xx.svd");
+  Project.AddSvdFile ("$(InstallDir)/Config/CPU/Cortex-M4F.svd");
+  Project.AddSvdFile ("$(InstallDir)/Config/Peripherals/stm32g473.svd");
   //
   // User settings
   //

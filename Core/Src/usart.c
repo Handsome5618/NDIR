@@ -23,40 +23,55 @@
 /* USER CODE BEGIN 0 */
 #include <stdio.h>
 
-uint16_t Serial1_RxState;              /*串口接收状态标志*/
-uint8_t Serial1_RxData[USART_REC_LEN]; /*串口接收数组*/
-uint8_t Serial1_RxBuff[RXBUFFERSIZE];  /*串口缓存接收数组*/
+uint16_t Serial2_RxState;              /*串口接收状态标志*/
+uint8_t Serial2_RxData[USART_REC_LEN]; /*串口接收数组*/
+uint8_t Serial2_RxBuff[RXBUFFERSIZE];  /*串口缓存接收数组*/
 /* USER CODE END 0 */
 
-UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart2;
 
-/* USART1 init function */
+/* USART2 init function */
 
-void MX_USART1_UART_Init(void)
+void MX_USART2_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART1_Init 0 */
+  /* USER CODE BEGIN USART2_Init 0 */
 
-  /* USER CODE END USART1_Init 0 */
+  /* USER CODE END USART2_Init 0 */
 
-  /* USER CODE BEGIN USART1_Init 1 */
+  /* USER CODE BEGIN USART2_Init 1 */
 
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART1_Init 2 */
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart2, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
 
-  /* USER CODE END USART1_Init 2 */
+  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -64,66 +79,74 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(uartHandle->Instance==USART1)
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+  if(uartHandle->Instance==USART2)
   {
-  /* USER CODE BEGIN USART1_MspInit 0 */
+  /* USER CODE BEGIN USART2_MspInit 0 */
 
-  /* USER CODE END USART1_MspInit 0 */
-    /* USART1 clock enable */
-    __HAL_RCC_USART1_CLK_ENABLE();
+  /* USER CODE END USART2_MspInit 0 */
+
+  /** Initializes the peripherals clocks
+  */
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+    PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* USART2 clock enable */
+    __HAL_RCC_USART2_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**USART1 GPIO Configuration
-    PA9     ------> USART1_TX
-    PA10     ------> USART1_RX
+    /**USART2 GPIO Configuration
+    PA2     ------> USART2_TX
+    PA3     ------> USART2_RX
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* USART1 interrupt Init */
-    HAL_NVIC_SetPriority(USART1_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);
-  /* USER CODE BEGIN USART1_MspInit 1 */
+    /* USART2 interrupt Init */
+    HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
+  /* USER CODE BEGIN USART2_MspInit 1 */
 
-  /* USER CODE END USART1_MspInit 1 */
+  /* USER CODE END USART2_MspInit 1 */
   }
 }
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 {
 
-  if(uartHandle->Instance==USART1)
+  if(uartHandle->Instance==USART2)
   {
-  /* USER CODE BEGIN USART1_MspDeInit 0 */
+  /* USER CODE BEGIN USART2_MspDeInit 0 */
 
-  /* USER CODE END USART1_MspDeInit 0 */
+  /* USER CODE END USART2_MspDeInit 0 */
     /* Peripheral clock disable */
-    __HAL_RCC_USART1_CLK_DISABLE();
+    __HAL_RCC_USART2_CLK_DISABLE();
 
-    /**USART1 GPIO Configuration
-    PA9     ------> USART1_TX
-    PA10     ------> USART1_RX
+    /**USART2 GPIO Configuration
+    PA2     ------> USART2_TX
+    PA3     ------> USART2_RX
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
 
-    /* USART1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(USART1_IRQn);
-  /* USER CODE BEGIN USART1_MspDeInit 1 */
+    /* USART2 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
+  /* USER CODE BEGIN USART2_MspDeInit 1 */
 
-  /* USER CODE END USART1_MspDeInit 1 */
+  /* USER CODE END USART2_MspDeInit 1 */
   }
 }
 
 /* USER CODE BEGIN 1 */
 /* 输出重定向 printf */
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 
 #ifdef __GNUC__
 /* With GCC, small printf (option LD Linker->Libraries->Small printf
@@ -135,7 +158,7 @@ extern UART_HandleTypeDef huart1;
 
 PUTCHAR_PROTOTYPE
 {
-    HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+    HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
 
     return ch;
 }
@@ -157,75 +180,76 @@ int _write(int file, char *ptr, int len)
  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART1) /* 如果是串口1 */
+    if (huart->Instance == USART2) /* 如果是串口1 */
     {
-        if ((Serial1_RxState & 0x8000) == 0) /* 接收未完成 */
+        if ((Serial2_RxState & 0x8000) == 0) /* 接收未完成 */
         {
-            if (Serial1_RxState & 0x4000) {
-                if (Serial1_RxBuff[0] != 0x0a) {
-                    Serial1_RxState = 0;
+            if (Serial2_RxState & 0x4000) {
+                if (Serial2_RxBuff[0] != 0x0a) {
+                    Serial2_RxState = 0;
                 } else {
-                    Serial1_RxState |= 0x8000;
+                    Serial2_RxState |= 0x8000;
                 }
             } else {
-                if (Serial1_RxBuff[0] == 0x0d) {
-                    Serial1_RxState |= 0x4000;
+                if (Serial2_RxBuff[0] == 0x0d) {
+                    Serial2_RxState |= 0x4000;
                 } else {
-                    Serial1_RxData[Serial1_RxState & 0X3FFF] = Serial1_RxBuff[0];
-                    Serial1_RxState++;
-                    if (Serial1_RxState > (USART_REC_LEN - 1)) {
-                        Serial1_RxState = 0; /* 接收数据错误,重新开始接收 */
+                    Serial2_RxData[Serial2_RxState & 0X3FFF] = Serial2_RxBuff[0];
+                    Serial2_RxState++;
+                    if (Serial2_RxState > (USART_REC_LEN - 1)) {
+                        Serial2_RxState = 0; /* 接收数据错误,重新开始接收 */
                     }
                 }
             }
         }
-        HAL_UART_Receive_IT(&huart1, (uint8_t *)Serial1_RxBuff, RXBUFFERSIZE);
+        HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2_RxBuff, RXBUFFERSIZE);
     }
 }
 
 /**
- * @brief   判断串口1接收状态接口
- * @param	无
+ * @brief   判断串口2接收状态接口
+ * @param	  无
  * @retval 	接收完成返回1 接收失败返回0
  */
-uint8_t Serial_GetSerial1_RxFlag(void)
+uint8_t Serial_GetSerial2_RxFlag(void)
 {
-    if (Serial1_RxState & 0x8000) {
+    if (Serial2_RxState & 0x8000) {
         return 1;
     }
     return 0;
 }
 
 /**
- * @brief   清除串口1接收标志位
- * @param	无
+ * @brief   清除串口2接收标志位
+ * @param	  无
  * @retval 	无
  */
-void Serial_ClearSerial1_RxFlag(void)
+void Serial_ClearSerial2_RxFlag(void)
 {
-    Serial1_RxState = 0;
+    Serial2_RxState = 0;
     for (uint16_t i = 0; i < USART_REC_LEN; i++) {
-        Serial1_RxData[i] = 0x00;
+        Serial2_RxData[i] = 0x00;
     }
 }
 
 /**
- * @brief   获取串口1接收数组大小
- * @param	无
+ * @brief   获取串口2接收数组大小
+ * @param	  无
  * @retval 	接收数组地址
  */
-uint16_t Serial_GetSerial1_RxDataNum(void)
+uint16_t Serial_GetSerial2_RxDataNum(void)
 {
-    return (Serial1_RxState & 0x3FFF);
+    return (Serial2_RxState & 0x3FFF);
 }
 
 /**
- * @brief   获取串口1接收数组地址
- * @param	无
+ * @brief   获取串口2接收数组地址
+ * @param	  无
  * @retval 	接收数组地址
  */
-uint8_t *Serial_GetSerial1_RxData(void)
+uint8_t *Serial_GetSerial2_RxData(void)
 {
-    return Serial1_RxData;
+    return Serial2_RxData;
 }
+
 /* USER CODE END 1 */
