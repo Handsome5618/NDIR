@@ -6,8 +6,8 @@
 #include "arm_common_tables.h"
 #include "arm_const_structs.h"
 
-#define BLOCK_SIZE 1  /* 调用一次arm_fir_f32处理的采样点个数 */
-#define NUM_TAPS   29 /* 滤波器系数个数 */
+#define BLOCK_SIZE 1   /* 调用一次arm_fir_f32处理的采样点个数 */
+#define NUM_TAPS   100 /* 滤波器系数个数 */
 
 int Median_Filter(int *ADC_Data, uint16_t Size);
 float Find_Max(float *arr, uint32_t size);

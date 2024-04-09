@@ -1,13 +1,27 @@
 #include "filter.h"
 
-// ÂË²¨Æ÷ÏµÊý 28½×FIRÂË²¨Æ÷
+// ÂË²¨Æ÷ÏµÊý 99½×FIRÂË²¨Æ÷ ½ØÖ¹ÆµÂÊ5Hz
 float firCoeffs32LP[NUM_TAPS] = {
-    0.004708919674, 0.005489378236, 0.00766007416, 0.01117761619, 0.01591668092,
-    0.02167543769, 0.02818588167, 0.03512848914, 0.0421503298, 0.04888555408,
-    0.05497694388, 0.06009719148, 0.06396857649, 0.06637971848, 0.06719842553,
-    0.06637971848, 0.06396857649, 0.06009719148, 0.05497694388, 0.04888555408,
-    0.0421503298, 0.03512848914, 0.02818588167, 0.02167543769, 0.01591668092,
-    0.01117761619, 0.00766007416, 0.005489378236, 0.004708919674};
+    0.001185529982, 0.001213171519, 0.001268957742, 0.001353632077, 0.001467787311,
+    0.00161186012, 0.001786126639, 0.001990698045, 0.002225517761, 0.00249036029,
+    0.002784828888, 0.003108356846, 0.003460207488, 0.003839477198, 0.004245098215,
+    0.004675841425, 0.005130324047, 0.005607013125, 0.006104233209, 0.00662017474,
+    0.007152902894, 0.007700365037, 0.008260402828, 0.008830764331, 0.009409110993,
+    0.009993034415, 0.01058006752, 0.01116769388, 0.01175336912, 0.01233452652,
+    0.01290859375, 0.01347300876, 0.01402523275, 0.01456275955, 0.01508313697,
+    0.01558397431, 0.01606296003, 0.01651786827, 0.0169465784, 0.01734708436,
+    0.01771750301, 0.01805608533, 0.01836123131, 0.01863149554, 0.01886559092,
+    0.01906240359, 0.01922099479, 0.01934060641, 0.01942066662, 0.01946079358,
+    0.01946079358, 0.01942066662, 0.01934060641, 0.01922099479, 0.01906240359,
+    0.01886559092, 0.01863149554, 0.01836123131, 0.01805608533, 0.01771750301,
+    0.01734708436, 0.0169465784, 0.01651786827, 0.01606296003, 0.01558397431,
+    0.01508313697, 0.01456275955, 0.01402523275, 0.01347300876, 0.01290859375,
+    0.01233452652, 0.01175336912, 0.01116769388, 0.01058006752, 0.009993034415,
+    0.009409110993, 0.008830764331, 0.008260402828, 0.007700365037, 0.007152902894,
+    0.00662017474, 0.006104233209, 0.005607013125, 0.005130324047, 0.004675841425,
+    0.004245098215, 0.003839477198, 0.003460207488, 0.003108356846, 0.002784828888,
+    0.00249036029, 0.002225517761, 0.001990698045, 0.001786126639, 0.00161186012,
+    0.001467787311, 0.001353632077, 0.001268957742, 0.001213171519, 0.001185529982};
 
 uint32_t blockSize = BLOCK_SIZE;
 
@@ -158,122 +172,67 @@ void fft(float *Input_Data, float *Output_Data)
 void NDIR_Data_Processor(float *InputData, float *PeaktoPeak, float *MinitoMini)
 {
     float temp;
-    temp = InputData[100];
-    for (int i = 100; i < 340; i++) {
+    temp = InputData[320];
+    for (int i = 320; i < 880; i++) {
         if (InputData[i] > temp) {
             temp = InputData[i];
         }
     }
     PeaktoPeak[0] = temp;
 
-    temp = InputData[341];
-    for (int i = 341; i < 560; i++) {
+    temp = InputData[881];
+    for (int i = 881; i < 1600; i++) {
         if (InputData[i] < temp) {
             temp = InputData[i];
         }
     }
     MinitoMini[0] = temp;
 
-    temp = InputData[561];
-    for (int i = 561; i < 770; i++) {
+    temp = InputData[1601];
+    for (int i = 1601; i < 2300; i++) {
         if (InputData[i] > temp) {
             temp = InputData[i];
         }
     }
     PeaktoPeak[1] = temp;
 
-    temp = InputData[771];
-    for (int i = 771; i < 1000; i++) {
+    temp = InputData[2301];
+    for (int i = 2301; i < 2750; i++) {
         if (InputData[i] < temp) {
             temp = InputData[i];
         }
     }
     MinitoMini[1] = temp;
 
-    temp = InputData[1001];
-    for (int i = 1001; i < 1210; i++) {
+    temp = InputData[2751];
+    for (int i = 2751; i < 3500; i++) {
         if (InputData[i] > temp) {
             temp = InputData[i];
         }
     }
     PeaktoPeak[2] = temp;
 
-    temp = InputData[1211];
-    for (int i = 1211; i < 1440; i++) {
+    temp = InputData[3501];
+    for (int i = 3501; i < 4100; i++) {
         if (InputData[i] < temp) {
             temp = InputData[i];
         }
     }
     MinitoMini[2] = temp;
 
-    temp = InputData[1441];
-    for (int i = 1441; i < 1680; i++) {
+    temp = InputData[4101];
+    for (int i = 4101; i < 4800; i++) {
         if (InputData[i] > temp) {
             temp = InputData[i];
         }
     }
     PeaktoPeak[3] = temp;
 
-    temp = InputData[1681];
-    for (int i = 1681; i < 1900; i++) {
+    temp = InputData[4801];
+    for (int i = 4801; i < 5100; i++) {
         if (InputData[i] < temp) {
             temp = InputData[i];
         }
     }
     MinitoMini[3] = temp;
-
-    // temp = InputData[100];
-    // for (int i = 100; i < 210; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // PeaktoPeak[0] = temp;
-
-    // temp = InputData[211];
-    // for (int i = 211; i < 320; i++) {
-    //     if (InputData[i] < temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // MinitoMini[0] = temp;
-
-    // temp = InputData[321];
-    // for (int i = 321; i < 440; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // PeaktoPeak[1] = temp;
-
-    // temp = InputData[441];
-    // for (int i = 441; i < 560; i++) {
-    //     if (InputData[i] < temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // MinitoMini[1] = temp;
-
-    // temp = InputData[561];
-    // for (int i = 561; i < 680; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // PeaktoPeak[2] = temp;
-
-    // temp = InputData[681];
-    // for (int i = 681; i < 800; i++) {
-    //     if (InputData[i] < temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // MinitoMini[2] = temp;
-
-    // temp = InputData[561];
-    // for (int i = 561; i < 680; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
 }
