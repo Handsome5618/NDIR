@@ -58,8 +58,6 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */
 uint8_t RI_Status_Get(void);
-uint8_t ADC_Status_Get(void);
-void ADC_Status_Clear(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

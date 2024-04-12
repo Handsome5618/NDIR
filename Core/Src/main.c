@@ -86,12 +86,16 @@ void SystemClock_Config(void);
 // #define IR_PID_I 1.60f
 // #define IR_PID_D 1.20f
 
-#define IR_PID_P           6.0f // 光源
-#define IR_PID_I           0.55f
-#define IR_PID_D           0.2f
+// #define IR_PID_P           6.0f // 光源
+// #define IR_PID_I           0.55f
+// #define IR_PID_D           0.2f
 
-#define IR_PID_MAXOUTPUT   6000
-#define IR_PID_MAXINTEGRAL 6000
+#define IR_PID_P           6.0f // 光源
+#define IR_PID_I           0.7f
+#define IR_PID_D           0.05f
+
+#define IR_PID_MAXOUTPUT   7000
+#define IR_PID_MAXINTEGRAL 7000
 
 #define GOAL_POW           460.0f
 
@@ -105,21 +109,23 @@ float SF6_PPM;
 uint32_t ADC2_Value = 0;
 float Temperature   = 0;
 
+extern float Goal_Pow;
+
 Mypid_t IR_PID;
 
 uint16_t ADC1_Value[DATA_SIZE][2]; // 双通道ADC数据
 
-float ADC_IN1_Data[DATA_SIZE];
-float ADC_IN2_Data[DATA_SIZE];
+float ADC_IN1_Data[DATA_SIZE]; // ADC1通道1数据
+float ADC_IN2_Data[DATA_SIZE]; // ADC1通道2数据
 
-float ADC_IN1_FirData[DATA_SIZE];
-float ADC_IN2_FirData[DATA_SIZE];
+float ADC_IN1_FirData[DATA_SIZE]; // ADC1通道1滤波数据
+float ADC_IN2_FirData[DATA_SIZE]; // ADC1通道2滤波数据
 
-float PeaktoPeak1[PEAK_SIZE];
-float MinitoMini1[PEAK_SIZE];
+float PeaktoPeak1[PEAK_SIZE]; // ADC1通道1峰峰值
+float MinitoMini1[PEAK_SIZE]; // ADC1通道1谷谷值
 
-float PeaktoPeak2[PEAK_SIZE];
-float MinitoMini2[PEAK_SIZE];
+float PeaktoPeak2[PEAK_SIZE]; // ADC1通道2峰峰值
+float MinitoMini2[PEAK_SIZE]; // ADC1通道2谷谷值
 
 uint32_t num;
 
@@ -174,6 +180,8 @@ int main(void)
 
     HAL_ADC_Start_DMA(&hadc2, (uint32_t *)&ADC2_Value, 1);
 
+    HAL_Delay(10000);
+
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -204,10 +212,26 @@ int main(void)
         NDIR_Data_Processor(ADC_IN2_FirData, PeaktoPeak2, MinitoMini2);
         SF6_PPM     = ((PeaktoPeak2[0] - PeaktoPeak1[0]) + (MinitoMini1[0] - MinitoMini2[0]) + (PeaktoPeak2[1] - PeaktoPeak1[1]) + (MinitoMini1[1] - MinitoMini2[1]) + (PeaktoPeak2[2] - PeaktoPeak1[2]) + (MinitoMini1[2] - MinitoMini2[2]) + (PeaktoPeak2[3] - PeaktoPeak1[3]) + (MinitoMini1[3] - MinitoMini2[3])) / 4;
         Temperature = (float)(ADC2_Value * 330) / 4095;
-        printf("%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, ((-6.48768 * Temperature) + (0.57746 * SF6_PPM) - 352.33899));
-        // for (uint32_t i = 0; i < DATA_SIZE; i++) {
-        //     printf("%.2f,%.2f,%ld\r\n", ADC_IN1_FirData[i], ADC_IN2_FirData[i], i);
-        // }
+
+        // printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", MinitoMini2[0], MinitoMini2[1], MinitoMini2[2], MinitoMini2[3], PeaktoPeak2[0], PeaktoPeak2[1], PeaktoPeak2[2], PeaktoPeak2[3]);
+
+        // 自适应功率调节
+        if (((MinitoMini2[0] + MinitoMini2[1] + MinitoMini2[2] + MinitoMini2[3]) / 4) < 589) {
+            Goal_Pow = Goal_Pow - 0.2;
+            if (Goal_Pow >= 540) { // 功率限幅
+                Goal_Pow = 540;
+            }
+            HAL_Delay(1000);
+        } else if ((((MinitoMini2[0] + MinitoMini2[1] + MinitoMini2[2] + MinitoMini2[3]) / 4) > 591)) {
+            Goal_Pow = Goal_Pow + 0.2;
+            if (Goal_Pow <= 450) { // 功率限幅
+                Goal_Pow = 450;
+            }
+
+            HAL_Delay(1000);
+        }
+
+        printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, Goal_Pow, ((MinitoMini2[0] + MinitoMini2[1] + MinitoMini2[2] + MinitoMini2[3]) / 4), ((PeaktoPeak2[0] + PeaktoPeak2[1] + PeaktoPeak2[2] + PeaktoPeak2[3]) / 4), ((-2.7902 * Temperature) + (0.63794 * SF6_PPM) - 561.99532));
 
         while (RI_Status_Get()) {
             Led_ledOff();
