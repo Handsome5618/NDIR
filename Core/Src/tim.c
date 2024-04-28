@@ -428,13 +428,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     if (htim->Instance == TIM5) {
         Pow_Original = INA226_Read_Pow();
         Pow          = Power_Register_LSB * Pow_Original;
-        
+
         if (RI_Status) {
             PID_Calc(&IR_PID, Goal_Pow, Pow);
             __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.output);
         } else {
             PID_Calc(&IR_PID, 0.0, Pow);
-            __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.maxOutput - IR_PID.maxOutput);
+            __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.output);
         }
     }
 }
