@@ -23,7 +23,8 @@
 /* USER CODE BEGIN 0 */
 uint8_t RI_Status   = 0;
 uint32_t ADC_Status = 0;
-float Goal_Pow      = 480.0;
+float Goal_Pow      = 450.0;
+float Goal_Voltage  = 5700.0;
 extern Mypid_t IR_PID;
 /* USER CODE END 0 */
 
@@ -74,7 +75,7 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = 2000;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
@@ -183,7 +184,7 @@ void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 1500-1;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 999;
+  htim6.Init.Period = 49999;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -416,8 +417,10 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
  * @param  	 huart: UART句柄类型指针
  * @retval   无
  */
-uint16_t Pow_Original = 0;
-float Pow;
+// uint16_t Pow_Original     = 0;
+uint16_t Voltage_Original = 0;
+// float Pow                 = 0;
+float Voltage = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     // 1Hz频率驱动光源
@@ -426,14 +429,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     // 定时计算PID输出 频率1000HZ
     if (htim->Instance == TIM5) {
-        Pow_Original = INA226_Read_Pow();
-        Pow          = Power_Register_LSB * Pow_Original;
+        // Pow_Original     = INA226_Read_Pow();
+        Voltage_Original = INA226_Read_Bus_Voltage();
+
+        // Pow     = Power_Register_LSB * Pow_Original;
+        Voltage = Bus_Voltage_Register_LSB * Voltage_Original;
 
         if (RI_Status) {
-            PID_Calc(&IR_PID, Goal_Pow, Pow);
+            PID_Calc(&IR_PID, Goal_Voltage, Voltage);
             __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.output);
         } else {
-            PID_Calc(&IR_PID, 0.0, Pow);
+            PID_Calc(&IR_PID, 0.0, Voltage);
             __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.output);
         }
     }

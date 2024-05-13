@@ -94,16 +94,16 @@ int Median_Filter(int *ADC_Data, uint16_t Size)
  * @param   采样点数
  * @retval  均值
  */
-float Average_Filter(float *Data, uint16_t Size)
+float Average_Filter(uint16_t *Data, uint16_t Size)
 {
     float sum = 0;
     float average;
 
-    for (int i = 1; i < Size - 1; i++) {
+    for (int i = 0; i < Size; i++) {
         sum += Data[i];
     }
 
-    average = sum / Size - 2;
+    average = sum / Size;
 
     return average;
 }

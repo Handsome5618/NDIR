@@ -12,7 +12,7 @@
 int Median_Filter(int *ADC_Data, uint16_t Size);
 float Find_Max(float *arr, uint32_t size);
 float Find_Mni(float *arr, uint32_t size);
-float Average_Filter(float *Data, uint16_t Size);
+float Average_Filter(uint16_t *Data, uint16_t Size);
 
 void arm_fir_f32_lp(float32_t *InputData, float32_t *OutputData, uint32_t DataNum);
 void fft(float *Input_Data, float *Output_Data);
