@@ -75,7 +75,7 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM2;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 4250;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
@@ -83,7 +83,7 @@ void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-    HAL_TIM_Base_Start_IT(&htim2);
+    // HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
 
@@ -124,7 +124,7 @@ void MX_TIM4_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM4_Init 2 */
-    HAL_TIM_Base_Start_IT(&htim4);
+    // HAL_TIM_Base_Start_IT(&htim4);
   /* USER CODE END TIM4_Init 2 */
 
 }
@@ -164,7 +164,7 @@ void MX_TIM5_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM5_Init 2 */
-    HAL_TIM_Base_Start_IT(&htim5);
+    // HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END TIM5_Init 2 */
 
 }
@@ -417,9 +417,9 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
  * @param  	 huart: UART句柄类型指针
  * @retval   无
  */
-// uint16_t Pow_Original     = 0;
-uint16_t Voltage_Original = 0;
-// float Pow                 = 0;
+uint16_t Pow_Original = 0;
+// uint16_t Voltage_Original = 0;
+float Pow     = 0;
 float Voltage = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -429,17 +429,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     // 定时计算PID输出 频率1000HZ
     if (htim->Instance == TIM5) {
-        // Pow_Original     = INA226_Read_Pow();
-        Voltage_Original = INA226_Read_Bus_Voltage();
+        Pow_Original = INA226_Read_Pow();
+        // Voltage_Original = INA226_Read_Bus_Voltage();
 
-        // Pow     = Power_Register_LSB * Pow_Original;
-        Voltage = Bus_Voltage_Register_LSB * Voltage_Original;
+        Pow = Power_Register_LSB * Pow_Original;
+        // Voltage = Bus_Voltage_Register_LSB * Voltage_Original;
 
         if (RI_Status) {
-            PID_Calc(&IR_PID, Goal_Voltage, Voltage);
+            PID_Calc(&IR_PID, Goal_Pow, Pow);
             __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.output);
         } else {
-            PID_Calc(&IR_PID, 0.0, Voltage);
+            PID_Calc(&IR_PID, 0.0, Pow);
             __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, IR_PID.output);
         }
     }

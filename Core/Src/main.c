@@ -83,7 +83,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-#define IR 8
+#define IR 9
 
 #if IR == 1 // 银色 老外
 #define IR_PID_P 12.5f
@@ -122,14 +122,21 @@ float Goal_ADC = 1290;
 #endif // DEBUG
 
 #if IR == 8 // CO 002
-#define IR_PID_P 7.0f
-#define IR_PID_I 1.5f
-#define IR_PID_D 0.5f
-float Goal_ADC = 0;
+#define IR_PID_P 12.0f
+#define IR_PID_I 2.5f
+#define IR_PID_D 5.0f
+float Goal_ADC = 2600;
 #endif // DEBUG
 
-#define IR_PID_MAXOUTPUT   7200
-#define IR_PID_MAXINTEGRAL 7200
+#if IR == 9 // CO 002
+#define IR_PID_P 10.0f
+#define IR_PID_I 2.5f
+#define IR_PID_D 10.0f
+float Goal_ADC = 1875;
+#endif // DEBUG
+
+#define IR_PID_MAXOUTPUT   8500
+#define IR_PID_MAXINTEGRAL 8500
 
 #define DATA_SIZE          5500
 #define PEAK_SIZE          4
@@ -172,8 +179,6 @@ float Peak_Min2;     // 信号通道峰谷值
 
 int num         = 0;
 uint8_t IR_Zero = 0;
-float Zero_Point;
-float Zreo_Subtract = 0;
 
 /* USER CODE END 0 */
 
@@ -218,8 +223,7 @@ int main(void)
     /* USER CODE BEGIN 2 */
     INA226_Init();
     Led_ledOff();
-    HAL_Delay(5000);
-    HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); // 开启PWM通道4
+    HAL_Delay(1000);
     PID_Init(&IR_PID, IR_PID_P, IR_PID_I, IR_PID_D, IR_PID_MAXOUTPUT, IR_PID_MAXINTEGRAL);
 
     HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED); // 初始校准
@@ -227,7 +231,7 @@ int main(void)
 
     HAL_ADC_Start_DMA(&hadc2, (uint32_t *)&Temperarure_Data, 10); // 2Hz温度采集
 
-    HAL_Delay(10000);
+    HAL_Delay(1000);
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -237,37 +241,27 @@ int main(void)
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
-        // 取零点
+        // 调零点
         if (IR_Zero == 0) {
-            while (!RI_Status_Get()) {
-                Led_ledOff();
-            }
             // 上升沿开始采集
-            HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC1_Value, 2 * DATA_SIZE);
-            while (ADC1_Value[DATA_SIZE - 1][1] == 0) {
+            HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); // 开启PWM通道4
+            HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC1_Value, 1);
+            while (ADC1_Value[0][0] < 2499) {
                 Led_ledOff();
             }
-            HAL_ADC_Stop_DMA(&hadc1);
-            for (uint32_t i = 0; i < DATA_SIZE; i++) {
-                ADC_IN1_Data[i]  = ADC1_Value[i][0];
-                ADC_IN2_Data[i]  = ADC1_Value[i][1];
-                ADC1_Value[i][0] = 0;
-                ADC1_Value[i][1] = 0;
+            while (ADC1_Value[0][0] > 2501) {
+                Led_ledOff();
+                HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_4);
             }
-            // 采集完成之后进行FIR滤波
-            arm_fir_f32_lp(ADC_IN1_Data, ADC_IN1_FirData, DATA_SIZE);
-            NDIR_Data_Processor(ADC_IN1_FirData, PeaktoPeak1, MinitoMini1);
-            // 分离各峰值和谷值及信号值ADC
-            Peak_Average1 = (PeaktoPeak1[0] + PeaktoPeak1[1] + PeaktoPeak1[2] + PeaktoPeak1[3]) / 4;
-            Min_Average1  = (MinitoMini1[0] + MinitoMini1[1] + MinitoMini1[2] + MinitoMini1[3]) / 4;
-            Peak_Min1     = (Peak_Average1 + Min_Average1) / 2;
-            Zero_Point    = Peak_Min1;
-            IR_Zero       = 1;
-            Zreo_Subtract = Zero_Point - 1480.0f;
-            HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); // 开启PWM通道4
-            printf("%.2f,%.2f\r\n", Zero_Point, Zreo_Subtract);
-
-            // 取零点完成
+            while (ADC1_Value[0][0] < 2499) {
+                HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4);
+                Led_ledOff();
+            }
+            HAL_TIM_Base_Start_IT(&htim4);
+            HAL_TIM_Base_Start_IT(&htim5);
+            HAL_ADC_Stop_DMA(&hadc1);
+            IR_Zero = 1;
+            printf("%d\r\n", ADC1_Value[0][0]);
         }
 
         //   等待驱动信号上升沿
@@ -303,37 +297,30 @@ int main(void)
         SF6_PPM     = ((((PeaktoPeak2[0] - PeaktoPeak1[0]) + (MinitoMini1[0] - MinitoMini2[0]) + (PeaktoPeak2[1] - PeaktoPeak1[1]) + (MinitoMini1[1] - MinitoMini2[1]) + (PeaktoPeak2[2] - PeaktoPeak1[2]) + (MinitoMini1[2] - MinitoMini2[2]) + (PeaktoPeak2[3] - PeaktoPeak1[3]) + (MinitoMini1[3] - MinitoMini2[3])) / 4));
         Temperature = (float)(Average_Filter(Temperarure_Data, 10) * 330) / 4095;
         // 自适应功率调节
-        // if (Peak_Min1 < (Goal_ADC - 1.0)) {
-        //     num++;
-        //     if (num >= 2) {
-        //         Goal_Voltage = Goal_Voltage + 1;
-        //         num          = 0;
+        // if (Peak_Min1 > (Goal_ADC + 1.0)) {
+        //     Goal_Pow = Goal_Pow - 0.1;
+        //     if (Goal_Pow <= 350) { // 功率限幅
+        //         Goal_Pow = 350;
+        //         HAL_Delay(1000);
         //     }
-        //     if (Goal_Voltage <= 4500) { // 功率限幅
-        //         Goal_Voltage = 4500;
+        // } else if (Peak_Min1 < (Goal_ADC - 1.0)) {
+        //     Goal_Pow = Goal_Pow + 0.1;
+        //     if (Goal_Pow >= 550) { // 功率限幅
+        //         Goal_Pow = 550;
+        //         HAL_Delay(1000);
         //     }
-        //     HAL_Delay(1000);
-        // } else if ((Peak_Min1 > (Goal_ADC + 1.0))) {
-        //     num--;
-        //     if (num <= -2) {
-        //         Goal_Voltage = Goal_Voltage - 1;
-        //         num          = 0;
-        //     }
-        //     if (Goal_Voltage >= 6000) { // 功率限幅
-        //         Goal_Voltage = 6000;
-        //     }
-        //     HAL_Delay(1000);
         // } else {
-        //     num = 0;
+        //     ;
         // }
 
-        printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, Goal_Voltage, Min_Average1, Peak_Average1, Min_Average2, Peak_Average2, Peak_Min1, Zero_Point);
+        printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, Goal_Pow, Min_Average1, Peak_Average1, Min_Average2, Peak_Average2, Peak_Min1);
         // 等待驱动信号下降沿 确保信号采集时是新的驱动周期开始时采集
         while (RI_Status_Get() && IR_Zero != 0) {
             Led_ledOff();
         }
+
+        /* USER CODE END 3 */
     }
-    /* USER CODE END 3 */
 }
 
 /**
