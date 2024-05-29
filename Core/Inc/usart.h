@@ -29,7 +29,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "tim.h"
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart2;
@@ -42,10 +42,11 @@ extern UART_HandleTypeDef huart2;
 void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-uint8_t Serial_GetSerial2_RxFlag(void);
-void Serial_ClearSerial2_RxFlag(void);
-uint16_t Serial_GetSerial2_RxDataNum(void);
-uint8_t *Serial_GetSerial2_RxData(void);
+uint8_t Serial_Serial2_RxFlag_Get(void);
+void Serial_Serial2_RxFlag_Set(void);
+void Serial_Serial2_RxFlag_Clear(void);
+uint16_t Serial_Serial2_RxDataNum_Get(void);
+uint8_t *Serial_Serial2_RxData_Get(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

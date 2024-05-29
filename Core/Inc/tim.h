@@ -32,15 +32,25 @@ extern "C" {
 #include "led.h"
 #include "ina226.h"
 #include "pid.h"
+#include "main.h"
+#include "stdio.h"
+#include <inttypes.h>
+#include <string.h>
+#include "usart.h"
+#include "coefficient.h"
 /* USER CODE END Includes */
 
 extern TIM_HandleTypeDef htim2;
+
+extern TIM_HandleTypeDef htim3;
 
 extern TIM_HandleTypeDef htim4;
 
 extern TIM_HandleTypeDef htim5;
 
 extern TIM_HandleTypeDef htim6;
+
+extern TIM_HandleTypeDef htim7;
 
 extern TIM_HandleTypeDef htim15;
 
@@ -49,15 +59,20 @@ extern TIM_HandleTypeDef htim15;
 /* USER CODE END Private defines */
 
 void MX_TIM2_Init(void);
+void MX_TIM3_Init(void);
 void MX_TIM4_Init(void);
 void MX_TIM5_Init(void);
 void MX_TIM6_Init(void);
+void MX_TIM7_Init(void);
 void MX_TIM15_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN Prototypes */
 uint8_t RI_Status_Get(void);
+void Rx_Time_Add(void);
+uint8_t Rx_Time_Get(void);
+void Rx_Time_Clear(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

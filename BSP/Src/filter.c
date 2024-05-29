@@ -188,51 +188,51 @@ void NDIR_Data_Processor(float *InputData, float *PeaktoPeak, float *MinitoMini)
     }
     MinitoMini[0] = temp;
 
-    // temp = InputData[1601];
-    // for (int i = 1601; i < 2300; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // PeaktoPeak[1] = temp;
+    temp = InputData[1601];
+    for (int i = 1601; i < 2300; i++) {
+        if (InputData[i] > temp) {
+            temp = InputData[i];
+        }
+    }
+    PeaktoPeak[1] = temp;
 
-    // temp = InputData[2301];
-    // for (int i = 2301; i < 2750; i++) {
-    //     if (InputData[i] < temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // MinitoMini[1] = temp;
+    temp = InputData[2301];
+    for (int i = 2301; i < 2750; i++) {
+        if (InputData[i] < temp) {
+            temp = InputData[i];
+        }
+    }
+    MinitoMini[1] = temp;
 
-    // temp = InputData[2751];
-    // for (int i = 2751; i < 3500; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // PeaktoPeak[2] = temp;
+    temp = InputData[2751];
+    for (int i = 2751; i < 3500; i++) {
+        if (InputData[i] > temp) {
+            temp = InputData[i];
+        }
+    }
+    PeaktoPeak[2] = temp;
 
-    // temp = InputData[3501];
-    // for (int i = 3501; i < 4100; i++) {
-    //     if (InputData[i] < temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // MinitoMini[2] = temp;
+    temp = InputData[3501];
+    for (int i = 3501; i < 4100; i++) {
+        if (InputData[i] < temp) {
+            temp = InputData[i];
+        }
+    }
+    MinitoMini[2] = temp;
 
-    // temp = InputData[4101];
-    // for (int i = 4101; i < 4800; i++) {
-    //     if (InputData[i] > temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // PeaktoPeak[3] = temp;
+    temp = InputData[4101];
+    for (int i = 4101; i < 4800; i++) {
+        if (InputData[i] > temp) {
+            temp = InputData[i];
+        }
+    }
+    PeaktoPeak[3] = temp;
 
-    // temp = InputData[4801];
-    // for (int i = 4801; i < 5100; i++) {
-    //     if (InputData[i] < temp) {
-    //         temp = InputData[i];
-    //     }
-    // }
-    // MinitoMini[3] = temp;
+    temp = InputData[4801];
+    for (int i = 4801; i < 5100; i++) {
+        if (InputData[i] < temp) {
+            temp = InputData[i];
+        }
+    }
+    MinitoMini[3] = temp;
 }

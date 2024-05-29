@@ -70,7 +70,7 @@ void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-
+    HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2_RxBuff, RXBUFFERSIZE);
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -119,7 +119,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* USART2 interrupt Init */
-    HAL_NVIC_SetPriority(USART2_IRQn, 6, 0);
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspInit 1 */
 
@@ -190,25 +190,17 @@ int _write(int file, char *ptr, int len)
  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART2) /* 如果是串口1 */
+    if (huart->Instance == USART2) /* 如果是串口2 */
     {
+        HAL_TIM_Base_Start_IT(&htim7);
+        Rx_Time_Clear();
         if ((Serial2_RxState & 0x8000) == 0) /* 接收未完成 */
         {
-            if (Serial2_RxState & 0x4000) {
-                if (Serial2_RxBuff[0] != 0x0a) {
-                    Serial2_RxState = 0;
-                } else {
-                    Serial2_RxState |= 0x8000;
-                }
-            } else {
-                if (Serial2_RxBuff[0] == 0x0d) {
-                    Serial2_RxState |= 0x4000;
-                } else {
-                    Serial2_RxData[Serial2_RxState & 0X3FFF] = Serial2_RxBuff[0];
-                    Serial2_RxState++;
-                    if (Serial2_RxState > (USART_REC_LEN - 1)) {
-                        Serial2_RxState = 0; /* 接收数据错误,重新开始接收 */
-                    }
+            {
+                Serial2_RxData[Serial2_RxState & 0X3FFF] = Serial2_RxBuff[0];
+                Serial2_RxState++;
+                if (Serial2_RxState > (USART_REC_LEN - 1)) {
+                    Serial2_RxState = 0; /* 接收数据错误,重新开始接收 */
                 }
             }
         }
@@ -217,11 +209,20 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 /**
+ * @brief   设置串口2标志位
+ * @param	无
+ * @retval 	无
+ */
+void Serial_Serial2_RxFlag_Set(void)
+{
+    Serial2_RxState |= 0x8000;
+}
+/**
  * @brief   判断串口2接收状态接口
  * @param	  无
  * @retval 	接收完成返回1 接收失败返回0
  */
-uint8_t Serial_GetSerial2_RxFlag(void)
+uint8_t Serial_Serial2_RxFlag_Get(void)
 {
     if (Serial2_RxState & 0x8000) {
         return 1;
@@ -234,12 +235,10 @@ uint8_t Serial_GetSerial2_RxFlag(void)
  * @param	  无
  * @retval 	无
  */
-void Serial_ClearSerial2_RxFlag(void)
+void Serial_Serial2_RxFlag_Clear(void)
 {
+    memset(Serial2_RxData, 0x00, 10);
     Serial2_RxState = 0;
-    for (uint16_t i = 0; i < USART_REC_LEN; i++) {
-        Serial2_RxData[i] = 0x00;
-    }
 }
 
 /**
@@ -247,7 +246,7 @@ void Serial_ClearSerial2_RxFlag(void)
  * @param	  无
  * @retval 	接收数组地址
  */
-uint16_t Serial_GetSerial2_RxDataNum(void)
+uint16_t Serial_Serial2_RxDataNum_Get(void)
 {
     return (Serial2_RxState & 0x3FFF);
 }
@@ -257,7 +256,7 @@ uint16_t Serial_GetSerial2_RxDataNum(void)
  * @param	  无
  * @retval 	接收数组地址
  */
-uint8_t *Serial_GetSerial2_RxData(void)
+uint8_t *Serial_Serial2_RxData_Get(void)
 {
     return Serial2_RxData;
 }

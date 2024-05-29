@@ -56,6 +56,7 @@
 #include <string.h>
 #include "ina226.h"
 #include "filter.h"
+#include "flash.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,7 +84,7 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-#define IR 6
+#define IR 8
 
 #if IR == 1 // 银色 老外
 #define IR_PID_P 12.5f
@@ -101,85 +102,75 @@ void SystemClock_Config(void);
 #define IR_PID_P 7.2f
 #define IR_PID_I 0.9f
 #define IR_PID_D 7.0f
-float Goal_ADC = 1120;
 #endif // DEBUG
 
 #if IR == 6 // 006
 #define IR_PID_P 12.0f
 #define IR_PID_I 2.05f
 #define IR_PID_D 20.0f
-float Goal_ADC = 720;
 #endif // DEBUG
 
 #if IR == 7 // CO 001
 // #define IR_PID_P 13.0f
 // #define IR_PID_I 3.2f
 // #define IR_PID_D 15.0f
-#define IR_PID_P 7.0f
-#define IR_PID_I 1.5f
-#define IR_PID_D 0.0f
-float Goal_ADC = 1290;
+#define IR_PID_P           7.0f
+#define IR_PID_I           1.5f
+#define IR_PID_D           0.0f
+#define IR_PID_MAXOUTPUT   9000
+#define IR_PID_MAXINTEGRAL 9000
 #endif // DEBUG
 
-#if IR == 8 // CO 001
-#define IR_PID_P 12.0f
-#define IR_PID_I 2.5f
-#define IR_PID_D 5.0f
-float Goal_ADC = 2600;
+#if IR == 8 // CO 002
+#define IR_PID_P           12.0f
+#define IR_PID_I           2.5f
+#define IR_PID_D           5.0f
+#define IR_PID_MAXOUTPUT   9000
+#define IR_PID_MAXINTEGRAL 9000
 #endif // DEBUG
 
-#if IR == 9 // CO 002
-#define IR_PID_P 10.0f
-#define IR_PID_I 2.5f
-#define IR_PID_D 10.0f
-float Goal_ADC = 1875;
-#endif // DEBUG
-
-#define IR_PID_MAXOUTPUT   8500
-#define IR_PID_MAXINTEGRAL 8500
-
-#define DATA_SIZE          1600 // 5500
-#define PEAK_SIZE          4
+#define DATA_SIZE 5500 // 5500
+#define PEAK_SIZE 4
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-float SF6_PPM; // 信号值ADC
-float Temperature = 0;
-
-uint16_t Temperarure_Data[10];
-
-extern float Goal_Pow;
-extern float Goal_Voltage;
-
-Mypid_t IR_PID;
-
+/*****************************************************************/
+float SF6_PPM_ADC; // 信号值ADC
+uint16_t SF6_PPM;
+/*****************************************************************/
+uint64_t Flash_Data[32] = {}; // Flash数据
+uint8_t SF6_Data[9];          // 数据上传数组
+float SF6_Coefficient;        // 标定斜率
+float SF6_Intercept;          // 标定截距
+/*****************************************************************/
+float Temperature = 0;         // 温度
+uint16_t Temperarure_Data[10]; // 温度数据
+/*****************************************************************/
+Mypid_t IR_PID;            // PID参数
+extern float Goal_Pow;     // 设定功率值
+extern float Goal_Voltage; // 设定电压值
+/*****************************************************************/
 uint16_t ADC1_Value[DATA_SIZE][2]; // 双通道ADC数据
-
-float ADC_IN1_Data[DATA_SIZE]; // ADC1通道1数据 参比通道
-float ADC_IN2_Data[DATA_SIZE]; // ADC1通道2数据 信号通道
-
-float ADC_IN1_FirData[DATA_SIZE]; // ADC1通道1滤波数据
-float ADC_IN2_FirData[DATA_SIZE]; // ADC1通道2滤波数据
-
-float PeaktoPeak1[PEAK_SIZE]; // ADC1通道1峰峰值
-float MinitoMini1[PEAK_SIZE]; // ADC1通道1谷谷值
-
-float PeaktoPeak2[PEAK_SIZE]; // ADC1通道2峰峰值
-float MinitoMini2[PEAK_SIZE]; // ADC1通道2谷谷值
-
-float Peak_Average1; // 参比通道峰峰值平均
-float Min_Average1;  // 参比通道谷谷值平均
-float Peak_Min1;     // 参比通道峰谷值
-
-float Peak_Average2; // 信号通道峰峰值平均
-float Min_Average2;  // 信号通道谷谷值平均
-float Peak_Min2;     // 信号通道峰谷值
-
-int num         = 0;
-uint8_t IR_Zero = 0;
-
+float ADC_IN1_Data[DATA_SIZE];     // ADC1通道1数据 参比通道
+float ADC_IN2_Data[DATA_SIZE];     // ADC1通道2数据 信号通道
+float ADC_IN1_FirData[DATA_SIZE];  // ADC1通道1滤波数据
+float ADC_IN2_FirData[DATA_SIZE];  // ADC1通道2滤波数据
+float PeaktoPeak1[PEAK_SIZE];      // ADC1通道1峰峰值
+float MinitoMini1[PEAK_SIZE];      // ADC1通道1谷谷值
+float PeaktoPeak2[PEAK_SIZE];      // ADC1通道2峰峰值
+float MinitoMini2[PEAK_SIZE];      // ADC1通道2谷谷值
+float Peak_Average1;               // 参比通道峰峰值平均
+float Min_Average1;                // 参比通道谷谷值平均
+float Peak_Min1;                   // 参比通道峰谷值
+float Peak_Average2;               // 信号通道峰峰值平均
+float Min_Average2;                // 信号通道谷谷值平均
+float Peak_Min2;                   // 信号通道峰谷值
+/*****************************************************************/
+static void SF6_Data_Init(void);
+static void SF6_Data_Updata(uint8_t *pData, uint16_t SF6_Data);
+/*****************************************************************/
 /* USER CODE END 0 */
 
 /**
@@ -220,19 +211,21 @@ int main(void)
     MX_TIM5_Init();
     MX_TIM6_Init();
     MX_TIM15_Init();
+    MX_TIM3_Init();
+    MX_TIM7_Init();
     /* USER CODE BEGIN 2 */
+    SF6_Data_Init();
     INA226_Init();
     Led_ledOff();
-    HAL_Delay(1000);
-    PID_Init(&IR_PID, IR_PID_P, IR_PID_I, IR_PID_D, IR_PID_MAXOUTPUT, IR_PID_MAXINTEGRAL);
-
-    HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4);           // 开启PWM通道4
+    HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); // 开启PWM通道4
+    // HAL_Delay(10000);
+    PID_Init(&IR_PID, IR_PID.kp, IR_PID.ki, IR_PID.kd, IR_PID_MAXOUTPUT, IR_PID_MAXINTEGRAL);
     HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED); // 初始校准
     HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED); // 初始校准
 
     HAL_ADC_Start_DMA(&hadc2, (uint32_t *)&Temperarure_Data, 10); // 2Hz温度采集
-
-    HAL_Delay(1000);
+    HAL_TIM_Base_Start_IT(&htim4);
+    HAL_TIM_Base_Start_IT(&htim5);
     /* USER CODE END 2 */
 
     /* Infinite loop */
@@ -242,6 +235,9 @@ int main(void)
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
+        // Flash_Data_Rrase(ADDR_FLASH_PAGE_63);
+        // Flash_Data_Write(ADDR_FLASH_PAGE_63, Flash_Data);
+        // Flash_Data_Read(ADDR_FLASH_PAGE_63, Flash_Data);
 
         //   等待驱动信号上升沿
         while (!RI_Status_Get()) {
@@ -265,54 +261,27 @@ int main(void)
         NDIR_Data_Processor(ADC_IN1_FirData, PeaktoPeak1, MinitoMini1);
         NDIR_Data_Processor(ADC_IN2_FirData, PeaktoPeak2, MinitoMini2);
         // 分离各峰值和谷值及信号值ADC
-        // Peak_Average1 = (PeaktoPeak1[0] + PeaktoPeak1[1] + PeaktoPeak1[2] + PeaktoPeak1[3]) / 4;
-        // Min_Average1  = (MinitoMini1[0] + MinitoMini1[1] + MinitoMini1[2] + MinitoMini1[3]) / 4;
-        // Peak_Min1     = Peak_Average1 - Min_Average1;
-
-        // Peak_Average2 = (PeaktoPeak2[0] + PeaktoPeak2[1] + PeaktoPeak2[2] + PeaktoPeak2[3]) / 4;
-        // Min_Average2  = (MinitoMini2[0] + MinitoMini2[1] + MinitoMini2[2] + MinitoMini2[3]) / 4;
-        // Peak_Min2     = Peak_Average2 - Min_Average2;
-
-        // SF6_PPM     = ((((PeaktoPeak2[0] - PeaktoPeak1[0]) + (MinitoMini1[0] - MinitoMini2[0]) + (PeaktoPeak2[1] - PeaktoPeak1[1]) + (MinitoMini1[1] - MinitoMini2[1]) + (PeaktoPeak2[2] - PeaktoPeak1[2]) + (MinitoMini1[2] - MinitoMini2[2]) + (PeaktoPeak2[3] - PeaktoPeak1[3]) + (MinitoMini1[3] - MinitoMini2[3])) / 4));
-        // Temperature = (float)(Average_Filter(Temperarure_Data, 10) * 330) / 4095;
-        // 自适应功率调节
-        // if (Peak_Min1 > (Goal_ADC + 1.0)) {
-        //     Goal_Pow = Goal_Pow - 0.1;
-        //     if (Goal_Pow <= 350) { // 功率限幅
-        //         Goal_Pow = 350;
-        //         HAL_Delay(1000);
-        //     }
-        // } else if (Peak_Min1 < (Goal_ADC - 1.0)) {
-        //     Goal_Pow = Goal_Pow + 0.1;
-        //     if (Goal_Pow >= 550) { // 功率限幅
-        //         Goal_Pow = 550;
-        //         HAL_Delay(1000);
-        //     }
-        // } else {
-        //     ;
-        // }
-
-        // printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, Goal_Pow, Min_Average1, Peak_Average1, Min_Average2, Peak_Average2, Peak_Min1);
-
-        Peak_Average1 = (PeaktoPeak1[0]);
-        Min_Average1  = (MinitoMini1[0]);
+        Peak_Average1 = (PeaktoPeak1[0] + PeaktoPeak1[1] + PeaktoPeak1[2] + PeaktoPeak1[3]) / 4;
+        Min_Average1  = (MinitoMini1[0] + MinitoMini1[1] + MinitoMini1[2] + MinitoMini1[3]) / 4;
         Peak_Min1     = Peak_Average1 - Min_Average1;
 
-        Peak_Average2 = (PeaktoPeak2[0]);
-        Min_Average2  = (MinitoMini2[0]);
+        Peak_Average2 = (PeaktoPeak2[0] + PeaktoPeak2[1] + PeaktoPeak2[2] + PeaktoPeak2[3]) / 4;
+        Min_Average2  = (MinitoMini2[0] + MinitoMini2[1] + MinitoMini2[2] + MinitoMini2[3]) / 4;
         Peak_Min2     = Peak_Average2 - Min_Average2;
 
-        SF6_PPM     = (((PeaktoPeak1[0] - PeaktoPeak2[0]) + (MinitoMini2[0] - MinitoMini1[0])));
+        SF6_PPM_ADC = ((((PeaktoPeak2[0] - PeaktoPeak1[0]) + (MinitoMini1[0] - MinitoMini2[0]) + (PeaktoPeak2[1] - PeaktoPeak1[1]) + (MinitoMini1[1] - MinitoMini2[1]) + (PeaktoPeak2[2] - PeaktoPeak1[2]) + (MinitoMini1[2] - MinitoMini2[2]) + (PeaktoPeak2[3] - PeaktoPeak1[3]) + (MinitoMini1[3] - MinitoMini2[3])) / 4));
         Temperature = (float)(Average_Filter(Temperarure_Data, 10) * 330) / 4095;
-
-        printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, Min_Average1, Peak_Average1, Min_Average2, Peak_Average2, Peak_Min1, (1.34238 * SF6_PPM - (10.5581 * Temperature) - 611.23653));
+        // printf("%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", SF6_PPM, Temperature, Min_Average1, Peak_Average1, Min_Average2, Peak_Average2, Peak_Min1, Peak_Min2);
+        SF6_PPM = (uint16_t)((SF6_Coefficient * SF6_PPM_ADC) + SF6_Intercept);
+        if (SF6_PPM < 0) SF6_PPM = 0;
+        if (SF6_PPM > 5000) SF6_PPM = 5000;
+        SF6_Data_Updata(SF6_Data, (uint16_t)SF6_PPM);
         // 等待驱动信号下降沿 确保信号采集时是新的驱动周期开始时采集
         while (RI_Status_Get()) {
             Led_ledOff();
         }
-
-        /* USER CODE END 3 */
     }
+    /* USER CODE END 3 */
 }
 
 /**
@@ -358,7 +327,97 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+/**
+ * @brief    数据初始化
+ * @param  	 无
+ * @retval   无
+ */
+static void SF6_Data_Init(void)
+{
+    SF6_Data[0] = 0xFF;
+    SF6_Data[1] = 0x10;
+    SF6_Data[2] = 0x04;
+    SF6_Data[3] = 0x00;
+    SF6_Data[4] = 0x00;
+    SF6_Data[5] = 0x00;
+    SF6_Data[6] = 0x13;
+    SF6_Data[7] = 0x88;
+    SF6_Data[8] = 0x51;
 
+    // Flash_Data[1] = 1200;
+    // Flash_Data[2] = 250;
+    // Flash_Data[3] = 500;
+    // Flash_Data[4] = 2903326;
+    // Flash_Data[5] = 2631052387;
+
+    Flash_Data_Read(ADDR_FLASH_PAGE_63, Flash_Data);
+    // 读取Flash中的PID参数
+    IR_PID.kp = (float)Flash_Data[1] / 100;
+    IR_PID.ki = (float)Flash_Data[2] / 100;
+    IR_PID.kd = (float)Flash_Data[3] / 100;
+    // // 读取Flash中的标定系数
+    SF6_Coefficient = -(float)Flash_Data[4] / 100000;
+    SF6_Intercept   = (float)Flash_Data[5] / 100000;
+}
+/**
+ * @brief    数据更新
+ * @param  	 数据存放数组
+ * @param  	 更新的数据
+ * @retval   无
+ */
+static void SF6_Data_Updata(uint8_t *pData, uint16_t SF6_PPM)
+{
+    uint8_t temp = 0;
+    pData[4]     = SF6_PPM >> 8;
+    pData[5]     = SF6_PPM;
+
+    for (uint8_t i = 1; i < 8; i++) {
+        temp = temp + pData[i];
+    }
+    temp     = (~temp) + 1;
+    pData[8] = temp;
+}
+/**
+ * @brief    解算ADC值获取
+ * @param  	 无
+ * @retval   解算ADC值
+ */
+float SF6_Data_Get(void)
+{
+    return SF6_PPM_ADC;
+}
+/**
+ * @brief    斜率更改
+ * @param  	 斜率
+ * @retval   无
+ */
+void SF6_Coefficient_Set(float Coefficient)
+{
+    SF6_Coefficient = Coefficient;
+}
+/**
+ * @brief    截距更改
+ * @param  	 截距
+ * @retval   无
+ */
+void SF6_Intercept_Set(float Intercept)
+{
+    SF6_Intercept = Intercept;
+}
+/**
+ * @brief    标定系数更改
+ * @param  	 斜率
+ * @param  	 截距
+ * @retval   斜率
+ */
+void SF6_Zero_Calibration(float Coefficient, float Intercept)
+{
+    Flash_Data[4] = (uint64_t)((-Coefficient) * 100000);
+    Flash_Data[5] = (uint64_t)(Intercept * 100000);
+
+    Flash_Data_Rrase(ADDR_FLASH_PAGE_63);
+    Flash_Data_Write(ADDR_FLASH_PAGE_63, Flash_Data);
+}
 /* USER CODE END 4 */
 
 /**
