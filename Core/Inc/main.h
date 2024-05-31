@@ -65,6 +65,7 @@ float SF6_Data_Get(void);
 void SF6_Coefficient_Set(float Coefficient);
 void SF6_Intercept_Set(float Intercept);
 void SF6_Zero_Calibration(float Coefficient, float Intercept);
+uint8_t SF6_ID_Get(void);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

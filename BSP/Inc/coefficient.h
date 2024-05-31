@@ -4,6 +4,12 @@
 #include "main.h"
 #include "math.h"
 
+#define WL_CO_5000_01_100PPM  4.0
+#define WL_CO_5000_01_5000PPM 181.0
+
+#define WL_CO_5000_02_100PPM  3.0
+#define WL_CO_5000_02_5000PPM 175.0
+
 typedef struct tagPOINT_2 {
     double x;
     double y;
